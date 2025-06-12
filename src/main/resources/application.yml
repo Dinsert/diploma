@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ads_db
+    username: user
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  liquibase:
+    change-log: classpath:liquibase/changelog-master.yml
+    enabled: true
+    url: jdbc:postgresql://localhost:5432/ads_db
+    user: user
+    password: password
