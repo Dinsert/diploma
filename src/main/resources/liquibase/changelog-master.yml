@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: liquibase/scripts/user_entities.sql
+  - include:
+      file: liquibase/scripts/ad_entities.sql
+  - include:
+      file: liquibase/scripts/comment_entities.sql
