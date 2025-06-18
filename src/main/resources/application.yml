@@ -12,3 +12,6 @@ spring:
     url: jdbc:postgresql://localhost:5432/ads_db
     user: user
     password: password
+path:
+  dir:
+    image: /uploads/images/
