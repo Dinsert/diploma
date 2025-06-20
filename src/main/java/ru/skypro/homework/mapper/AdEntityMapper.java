@@ -23,6 +23,7 @@ public interface AdEntityMapper {
     ExtendedAd toExtendedAd(AdEntity adEntity);
 
     @Mapping(source = "author", target = "author")
+    @Mapping(source = "image", target = "image")
     AdEntity createAdEntity(CreateOrUpdateAd properties, String image, UserEntity author);
 
     void updateAdEntity(CreateOrUpdateAd updateAd, @MappingTarget AdEntity adEntity);
