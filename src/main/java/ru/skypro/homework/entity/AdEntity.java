@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.util.List;
 
 @ToString
 @EqualsAndHashCode(of = "pk")
@@ -19,18 +20,25 @@ public class AdEntity {
     @Column(name = "pk", nullable = false)
     private int pk;
 
+    @Column(name = "title", nullable = false)
+    private String title;
+
+    @Column(name = "description", nullable = false)
+    private String description;
+
+    @Column(name = "price", nullable = false)
+    private int price;
+
+    @Column(name = "image", nullable = false)
+    private String image;
+
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "author", nullable = false)
     private UserEntity author;
 
-    @Column(name = "image", nullable = false)
-    private String image;
-
-    @Column(name = "price", nullable = false)
-    private int price;
-
-    @Column(name = "title", nullable = false)
-    private String title;
+    @ToString.Exclude
+    @OneToMany(mappedBy = "adEntity")
+    private List<CommentEntity> commentEntities;
 
 }

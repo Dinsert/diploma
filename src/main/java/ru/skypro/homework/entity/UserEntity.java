@@ -4,9 +4,9 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import ru.skypro.homework.dto.Role;
 
 import javax.persistence.*;
+import java.util.List;
 
 @ToString
 @EqualsAndHashCode(of = "id")
@@ -17,11 +17,13 @@ public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
     private int id;
 
-    @Column(name = "email", nullable = false)
-    private String email;
+    @Column(name = "username", nullable = false)
+    private String username;
+
+    @Column(name = "password", nullable = false)
+    private String password;
 
     @Column(name = "first_name", nullable = false)
     private String firstName;
@@ -32,10 +34,13 @@ public class UserEntity {
     @Column(name = "phone", nullable = false)
     private String phone;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false)
-    private Role role;
+    @Column(name = "authority", nullable = false)
+    private String authority;
 
-    @Column(name = "image", nullable = false)
+    @Column(name = "image", nullable = true)
     private String image;
+
+    @ToString.Exclude
+    @OneToMany(mappedBy = "author")
+    private List<AdEntity> adEntities;
 }
