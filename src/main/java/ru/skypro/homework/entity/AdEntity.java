@@ -38,7 +38,7 @@ public class AdEntity {
     private UserEntity author;
 
     @ToString.Exclude
-    @OneToMany(mappedBy = "adEntity")
+    @OneToMany(mappedBy = "adEntity", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<CommentEntity> commentEntities;
 
 }
