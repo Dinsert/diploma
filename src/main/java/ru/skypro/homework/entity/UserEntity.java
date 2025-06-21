@@ -19,25 +19,25 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "username", nullable = false)
+    @Column(name = "username", nullable = false, length = 32)
     private String username;
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "password", nullable = false, length = 255)
     private String password;
 
-    @Column(name = "first_name", nullable = false)
+    @Column(name = "first_name", nullable = false, length = 16)
     private String firstName;
 
-    @Column(name = "last_name", nullable = false)
+    @Column(name = "last_name", nullable = false, length = 16)
     private String lastName;
 
-    @Column(name = "phone", nullable = false)
+    @Column(name = "phone", nullable = false, length = 16)
     private String phone;
 
-    @Column(name = "authority", nullable = false)
+    @Column(name = "authority", nullable = false, length = 10)
     private String authority;
 
-    @Column(name = "image", nullable = true)
+    @Column(name = "image", nullable = true, length = 255)
     private String image;
 
     @ToString.Exclude
