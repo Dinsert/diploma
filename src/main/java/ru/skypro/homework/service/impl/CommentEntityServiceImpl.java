@@ -10,6 +10,9 @@ import ru.skypro.homework.dto.CreateOrUpdateComment;
 import ru.skypro.homework.entity.AdEntity;
 import ru.skypro.homework.entity.CommentEntity;
 import ru.skypro.homework.entity.UserEntity;
+import ru.skypro.homework.exception.AdEntityNotFoundException;
+import ru.skypro.homework.exception.CommentEntityNotFoundException;
+import ru.skypro.homework.exception.UserEntityNotFoundException;
 import ru.skypro.homework.mapper.CommentEntityMapper;
 import ru.skypro.homework.repository.AdEntityRepository;
 import ru.skypro.homework.repository.CommentEntityRepository;
@@ -32,7 +35,7 @@ public class CommentEntityServiceImpl implements CommentEntityService {
     @Transactional(readOnly = true)
     @Override
     public Comments getComments(int id) {
-        AdEntity adEntity = adEntityRepository.findById(id).orElseThrow();
+        AdEntity adEntity = adEntityRepository.findById(id).orElseThrow(() -> new AdEntityNotFoundException("Объявление не найдено"));
         List<Comment> results = adEntity.getCommentEntities().stream().map(commentEntityMapper::toDto).toList();
 
         Comments comments = new Comments();
@@ -44,11 +47,11 @@ public class CommentEntityServiceImpl implements CommentEntityService {
     @Transactional
     @Override
     public Comment addComment(int id, CreateOrUpdateComment createComment, Authentication authentication) {
-        UserEntity userEntity = userEntityRepository.findByUsername(authentication.getName()).orElseThrow();
-        AdEntity adEntity = adEntityRepository.findById(id).orElseThrow();
+        UserEntity userEntity = userEntityRepository.findByUsername(authentication.getName()).orElseThrow(() -> new UserEntityNotFoundException("Пользователь не найден"));
+        AdEntity adEntity = adEntityRepository.findById(id).orElseThrow(() -> new AdEntityNotFoundException("Объявление не найдено"));
         List<CommentEntity> commentEntities = adEntity.getCommentEntities();
 
-        CommentEntity commentEntity = commentEntityMapper.createCommentEntity(userEntity, adEntity, createComment, new Date().getTime());
+        CommentEntity commentEntity = commentEntityMapper.createCommentEntity(userEntity, adEntity, createComment);
         commentEntities.add(commentEntity);
         CommentEntity savedCommentEntity = commentEntityRepository.save(commentEntity);
 
@@ -58,7 +61,7 @@ public class CommentEntityServiceImpl implements CommentEntityService {
     @Transactional
     @Override
     public void deleteComment(int adId, int commentId) {
-        CommentEntity commentEntity = commentEntityRepository.findByAdEntity_PkAndPk(adId, commentId).orElseThrow();
+        CommentEntity commentEntity = commentEntityRepository.findByAdEntity_PkAndPk(adId, commentId).orElseThrow(() -> new CommentEntityNotFoundException("Комментарий не найден"));
 
         commentEntityRepository.delete(commentEntity);
     }
@@ -66,7 +69,7 @@ public class CommentEntityServiceImpl implements CommentEntityService {
     @Transactional
     @Override
     public Comment updateComment(int adId, int commentId, CreateOrUpdateComment updateComment) {
-        CommentEntity commentEntity = commentEntityRepository.findByAdEntity_PkAndPk(adId, commentId).orElseThrow();
+        CommentEntity commentEntity = commentEntityRepository.findByAdEntity_PkAndPk(adId, commentId).orElseThrow(() -> new CommentEntityNotFoundException("Комментарий не найден"));
 
         commentEntity.setText(updateComment.getText());
         commentEntityRepository.save(commentEntity);

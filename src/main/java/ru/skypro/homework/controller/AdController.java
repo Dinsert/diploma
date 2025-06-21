@@ -18,6 +18,7 @@ import ru.skypro.homework.dto.CreateOrUpdateAd;
 import ru.skypro.homework.dto.ExtendedAd;
 import ru.skypro.homework.service.AdEntityService;
 
+import javax.validation.Valid;
 import java.io.IOException;
 
 @Tag(name = "Объявления")
@@ -40,7 +41,7 @@ public class AdController {
     @ApiResponse(responseCode = "401", description = "Unauthorized")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Ad addAd(@RequestPart CreateOrUpdateAd properties, @RequestPart MultipartFile image, Authentication authentication) throws IOException {
+    public Ad addAd(@Valid @RequestPart CreateOrUpdateAd properties, @RequestPart MultipartFile image, Authentication authentication) throws IOException {
         return adEntityService.addAd(properties, image, authentication);
     }
 
@@ -72,7 +73,7 @@ public class AdController {
     @ApiResponse(responseCode = "404", description = "Not found")
     @PreAuthorize("hasRole('USER') and @adEntityServiceImpl.isOwner(authentication.name, #id) or hasRole('ADMIN')")
     @PatchMapping("{id}")
-    public Ad updateAds(@PathVariable int id, @RequestBody CreateOrUpdateAd updateAd, Authentication authentication) {
+    public Ad updateAds(@PathVariable int id, @Valid @RequestBody CreateOrUpdateAd updateAd, Authentication authentication) {
         return adEntityService.updateAds(id, updateAd);
     }
 
@@ -85,7 +86,8 @@ public class AdController {
     }
 
     @Operation(summary = "Обновление картинки объявления", operationId = "updateImage")
-    @ApiResponse(responseCode = "200", description = "OK")
+    @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(mediaType = "application/octet-stream", schema = @Schema(type = "string", format = "byte")))
     @ApiResponse(responseCode = "401", description = "Unauthorized")
     @ApiResponse(responseCode = "403", description = "Forbidden")
     @ApiResponse(responseCode = "404", description = "Not found")

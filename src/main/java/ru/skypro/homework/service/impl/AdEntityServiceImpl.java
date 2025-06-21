@@ -11,6 +11,8 @@ import ru.skypro.homework.dto.CreateOrUpdateAd;
 import ru.skypro.homework.dto.ExtendedAd;
 import ru.skypro.homework.entity.AdEntity;
 import ru.skypro.homework.entity.UserEntity;
+import ru.skypro.homework.exception.AdEntityNotFoundException;
+import ru.skypro.homework.exception.UserEntityNotFoundException;
 import ru.skypro.homework.mapper.AdEntityMapper;
 import ru.skypro.homework.repository.AdEntityRepository;
 import ru.skypro.homework.repository.UserEntityRepository;
@@ -44,7 +46,7 @@ public class AdEntityServiceImpl implements AdEntityService {
     @Transactional
     @Override
     public Ad addAd(CreateOrUpdateAd properties, MultipartFile image, Authentication authentication) throws IOException {
-        UserEntity userEntity = userEntityRepository.findByUsername(authentication.getName()).orElseThrow();
+        UserEntity userEntity = userEntityRepository.findByUsername(authentication.getName()).orElseThrow(() -> new UserEntityNotFoundException("Пользователь не найден"));
 
         String imagePath = imageService.saveImage(image);
         AdEntity adEntity = adEntityMapper.createAdEntity(properties, imagePath, userEntity);
@@ -56,7 +58,7 @@ public class AdEntityServiceImpl implements AdEntityService {
     @Transactional(readOnly = true)
     @Override
     public ExtendedAd getAds(int id, Authentication authentication) {
-        AdEntity adEntity = adEntityRepository.findById(id).orElseThrow();
+        AdEntity adEntity = adEntityRepository.findById(id).orElseThrow(() -> new AdEntityNotFoundException("Объявление не найдено"));
 
         return adEntityMapper.toExtendedAd(adEntity);
     }
@@ -64,7 +66,7 @@ public class AdEntityServiceImpl implements AdEntityService {
     @Transactional
     @Override
     public void removeAd(int id) throws IOException {
-        AdEntity adEntity = adEntityRepository.findById(id).orElseThrow();
+        AdEntity adEntity = adEntityRepository.findById(id).orElseThrow(() -> new AdEntityNotFoundException("Объявление не найдено"));
         String adEntityImage = adEntity.getImage();
 
         adEntityRepository.delete(adEntity);
@@ -74,7 +76,7 @@ public class AdEntityServiceImpl implements AdEntityService {
     @Transactional
     @Override
     public Ad updateAds(int id, CreateOrUpdateAd updateAd) {
-        AdEntity adEntity = adEntityRepository.findById(id).orElseThrow();
+        AdEntity adEntity = adEntityRepository.findById(id).orElseThrow(() -> new AdEntityNotFoundException("Объявление не найдено"));
 
         adEntityMapper.updateAdEntity(updateAd, adEntity);
         adEntityRepository.save(adEntity);
@@ -85,7 +87,7 @@ public class AdEntityServiceImpl implements AdEntityService {
     @Transactional(readOnly = true)
     @Override
     public Ads getAdsMe(Authentication authentication) {
-        UserEntity userEntity = userEntityRepository.findByUsername(authentication.getName()).orElseThrow();
+        UserEntity userEntity = userEntityRepository.findByUsername(authentication.getName()).orElseThrow(() -> new UserEntityNotFoundException("Пользователь не найден"));
         List<Ad> results = userEntity.getAdEntities().stream().map(adEntityMapper::toDto).toList();
 
         Ads ads = new Ads();
@@ -97,7 +99,7 @@ public class AdEntityServiceImpl implements AdEntityService {
     @Transactional
     @Override
     public byte[] updateImage(int id, MultipartFile image, Authentication authentication) throws IOException {
-        AdEntity adEntity = adEntityRepository.findById(id).orElseThrow();
+        AdEntity adEntity = adEntityRepository.findById(id).orElseThrow(() -> new AdEntityNotFoundException("Объявление не найдено"));
         String oldAdEntityImage = adEntity.getImage();
 
         String imagePath = imageService.saveImage(image);

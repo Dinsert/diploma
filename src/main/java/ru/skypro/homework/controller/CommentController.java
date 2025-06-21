@@ -14,6 +14,8 @@ import ru.skypro.homework.dto.Comments;
 import ru.skypro.homework.dto.CreateOrUpdateComment;
 import ru.skypro.homework.service.CommentEntityService;
 
+import javax.validation.Valid;
+
 @Tag(name = "Комментарии")
 @RequestMapping("/ads")
 @RequiredArgsConstructor
@@ -36,7 +38,7 @@ public class CommentController {
     @ApiResponse(responseCode = "401", description = "Unauthorized")
     @ApiResponse(responseCode = "404", description = "Not found")
     @PostMapping("{id}/comments")
-    public Comment addComment(@PathVariable int id, @RequestBody CreateOrUpdateComment createComment, Authentication authentication) {
+    public Comment addComment(@PathVariable int id, @Valid @RequestBody CreateOrUpdateComment createComment, Authentication authentication) {
         return commentEntityService.addComment(id, createComment, authentication);
     }
 
@@ -58,7 +60,7 @@ public class CommentController {
     @ApiResponse(responseCode = "404", description = "Not found")
     @PreAuthorize("hasRole('USER') and @commentEntityServiceImpl.isOwner(authentication.name, #adId, #commentId) or hasRole('ADMIN')")
     @PatchMapping("{adId}/comments/{commentId}")
-    public Comment updateComment(@PathVariable int adId, @PathVariable int commentId, @RequestBody CreateOrUpdateComment updateComment, Authentication authentication) {
+    public Comment updateComment(@PathVariable int adId, @PathVariable int commentId, @Valid @RequestBody CreateOrUpdateComment updateComment, Authentication authentication) {
         return commentEntityService.updateComment(adId, commentId, updateComment);
     }
 }

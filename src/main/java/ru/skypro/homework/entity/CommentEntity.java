@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @ToString
 @EqualsAndHashCode(of = "pk")
@@ -19,7 +20,7 @@ public class CommentEntity {
     @Column(name = "pk", nullable = false)
     private int pk;
 
-    @Column(name = "text", nullable = false)
+    @Column(name = "text", nullable = false, length = 64)
     private String text;
 
     @Column(name = "created_at", nullable = false)
@@ -35,4 +36,10 @@ public class CommentEntity {
     @JoinColumn(name = "ad_entity", nullable = false)
     private AdEntity adEntity;
 
+    @PrePersist
+    protected void onCreate() {
+        if (createdAt == 0) {
+            createdAt = new Date().getTime();
+        }
+    }
 }

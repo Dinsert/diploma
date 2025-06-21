@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,6 +16,7 @@ import ru.skypro.homework.dto.UpdateUser;
 import ru.skypro.homework.dto.User;
 import ru.skypro.homework.service.UserEntityService;
 
+import javax.validation.Valid;
 import java.io.IOException;
 
 
@@ -30,8 +32,9 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "OK")
     @ApiResponse(responseCode = "401", description = "Unauthorized")
     @ApiResponse(responseCode = "403", description = "Forbidden")
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/set_password")
-    public void setPassword(@RequestBody NewPassword newPassword, Authentication authentication) {
+    public void setPassword(@Valid @RequestBody NewPassword newPassword, Authentication authentication) {
         userEntityService.setPassword(newPassword, authentication);
     }
 
@@ -47,7 +50,7 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = UpdateUser.class)))
     @ApiResponse(responseCode = "401", description = "Unauthorized")
     @PatchMapping("/me")
-    public UpdateUser updateUser(@RequestBody UpdateUser updateUser, Authentication authentication) {
+    public UpdateUser updateUser(@Valid @RequestBody UpdateUser updateUser, Authentication authentication) {
         return userEntityService.updateUser(updateUser, authentication);
     }
 

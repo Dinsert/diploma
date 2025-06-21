@@ -19,6 +19,6 @@ public interface CommentEntityMapper {
     @Mapping(target = "pk", ignore = true)
     @Mapping(source = "adEntity", target = "adEntity")
     @Mapping(source = "author", target = "author")
-    CommentEntity createCommentEntity(UserEntity author, AdEntity adEntity, CreateOrUpdateComment createComment, long createdAt);
+    CommentEntity createCommentEntity(UserEntity author, AdEntity adEntity, CreateOrUpdateComment createComment);
 
 }

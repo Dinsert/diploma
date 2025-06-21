@@ -20,16 +20,16 @@ public class AdEntity {
     @Column(name = "pk", nullable = false)
     private int pk;
 
-    @Column(name = "title", nullable = false)
+    @Column(name = "title", nullable = false, length = 32)
     private String title;
 
-    @Column(name = "description", nullable = false)
+    @Column(name = "description", nullable = false, length = 64)
     private String description;
 
     @Column(name = "price", nullable = false)
     private int price;
 
-    @Column(name = "image", nullable = false)
+    @Column(name = "image", nullable = false, length = 255)
     private String image;
 
     @ToString.Exclude
