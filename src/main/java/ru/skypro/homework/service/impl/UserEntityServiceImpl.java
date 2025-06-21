@@ -30,7 +30,9 @@ public class UserEntityServiceImpl implements UserEntityService {
     @Override
     public void setPassword(NewPassword newPassword, Authentication authentication) {
         UserEntity userEntity = userEntityRepository.findByUsername(authentication.getName()).orElseThrow();
+
         boolean matches = passwordEncoder.matches(newPassword.getCurrentPassword(), userEntity.getPassword());
+
         if (matches) {
             userEntity.setPassword(passwordEncoder.encode(newPassword.getNewPassword()));
             userEntityRepository.save(userEntity);
@@ -41,6 +43,7 @@ public class UserEntityServiceImpl implements UserEntityService {
     @Override
     public User getUser(Authentication authentication) {
         UserEntity userEntity = userEntityRepository.findByUsername(authentication.getName()).orElseThrow();
+
         return userEntityMapper.toDTO(userEntity);
     }
 
@@ -48,8 +51,10 @@ public class UserEntityServiceImpl implements UserEntityService {
     @Override
     public UpdateUser updateUser(UpdateUser updateUser, Authentication authentication) {
         UserEntity userEntity = userEntityRepository.findByUsername(authentication.getName()).orElseThrow();
+
         userEntityMapper.updateUserEntity(updateUser, userEntity);
         userEntityRepository.save(userEntity);
+
         return updateUser;
     }
 
@@ -57,8 +62,19 @@ public class UserEntityServiceImpl implements UserEntityService {
     @Override
     public void updateUserImage(MultipartFile image, Authentication authentication) throws IOException {
         UserEntity userEntity = userEntityRepository.findByUsername(authentication.getName()).orElseThrow();
+        String userEntityImage = userEntity.getImage();
+
         String imagePath = imageService.saveImage(image);
         userEntity.setImage(imagePath);
         userEntityRepository.save(userEntity);
+
+        if (userEntityImage != null) {
+            new Thread(()  -> {
+                try {
+                    Thread.sleep(800);
+                    imageService.deleteImage(userEntityImage);
+                } catch (IOException | InterruptedException ignored) {}
+            }).start();
+        }
     }
 }

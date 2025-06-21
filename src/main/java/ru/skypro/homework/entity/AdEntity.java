@@ -38,6 +38,7 @@ public class AdEntity {
     private UserEntity author;
 
     @ToString.Exclude
+    @OrderBy("createdAt DESC")
     @OneToMany(mappedBy = "adEntity", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<CommentEntity> commentEntities;
 

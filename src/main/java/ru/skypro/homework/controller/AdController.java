@@ -61,7 +61,7 @@ public class AdController {
     @PreAuthorize("hasRole('USER') and @adEntityServiceImpl.isOwner(authentication.name, #id) or hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("{id}")
-    public void removeAd(@PathVariable int id, Authentication authentication) {
+    public void removeAd(@PathVariable int id, Authentication authentication) throws IOException {
         adEntityService.removeAd(id);
     }
 

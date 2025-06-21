@@ -32,9 +32,11 @@ public class AuthServiceImpl implements AuthService {
         if (userEntityRepository.findByUsername(register.getUsername()).isPresent()) {
             return false;
         }
+
         UserEntity userEntity = userEntityMapper.registerUser(register);
         userEntity.setPassword(passwordEncoder.encode(register.getPassword()));
         userEntityRepository.save(userEntity);
+
         return true;
     }
 

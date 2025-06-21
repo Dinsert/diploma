@@ -9,4 +9,6 @@ public interface ImageService {
     String saveImage(MultipartFile multipartFile) throws IOException;
 
     byte[] getImage(String filePath) throws IOException;
+
+    void deleteImage(String filePath) throws IOException;
 }

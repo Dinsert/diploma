@@ -34,6 +34,7 @@ public class AdEntityServiceImpl implements AdEntityService {
     @Override
     public Ads getAllAds() {
         List<Ad> results = adEntityRepository.findAll().stream().map(adEntityMapper::toDto).toList();
+
         Ads ads = new Ads();
         ads.setResults(results);
         ads.setCount(results.size());
@@ -44,8 +45,8 @@ public class AdEntityServiceImpl implements AdEntityService {
     @Override
     public Ad addAd(CreateOrUpdateAd properties, MultipartFile image, Authentication authentication) throws IOException {
         UserEntity userEntity = userEntityRepository.findByUsername(authentication.getName()).orElseThrow();
-        String imagePath = imageService.saveImage(image);
 
+        String imagePath = imageService.saveImage(image);
         AdEntity adEntity = adEntityMapper.createAdEntity(properties, imagePath, userEntity);
         AdEntity savedAdEntity = adEntityRepository.save(adEntity);
 
@@ -56,23 +57,29 @@ public class AdEntityServiceImpl implements AdEntityService {
     @Override
     public ExtendedAd getAds(int id, Authentication authentication) {
         AdEntity adEntity = adEntityRepository.findById(id).orElseThrow();
+
         return adEntityMapper.toExtendedAd(adEntity);
     }
 
     @Transactional
     @Override
-    public void removeAd(int id) {
+    public void removeAd(int id) throws IOException {
         AdEntity adEntity = adEntityRepository.findById(id).orElseThrow();
+        String adEntityImage = adEntity.getImage();
+
         adEntityRepository.delete(adEntity);
+        imageService.deleteImage(adEntityImage);
     }
 
     @Transactional
     @Override
     public Ad updateAds(int id, CreateOrUpdateAd updateAd) {
         AdEntity adEntity = adEntityRepository.findById(id).orElseThrow();
+
         adEntityMapper.updateAdEntity(updateAd, adEntity);
-        AdEntity savedAdEntity = adEntityRepository.save(adEntity);
-        return adEntityMapper.toDto(savedAdEntity);
+        adEntityRepository.save(adEntity);
+
+        return adEntityMapper.toDto(adEntity);
     }
 
     @Transactional(readOnly = true)
@@ -91,9 +98,13 @@ public class AdEntityServiceImpl implements AdEntityService {
     @Override
     public byte[] updateImage(int id, MultipartFile image, Authentication authentication) throws IOException {
         AdEntity adEntity = adEntityRepository.findById(id).orElseThrow();
+        String oldAdEntityImage = adEntity.getImage();
+
         String imagePath = imageService.saveImage(image);
         adEntity.setImage(imagePath);
         adEntityRepository.save(adEntity);
+        imageService.deleteImage(oldAdEntityImage);
+
         return imageService.getImage(imagePath);
     }
 
@@ -101,9 +112,11 @@ public class AdEntityServiceImpl implements AdEntityService {
     @Override
     public boolean isOwner(String username, int id) {
         Optional<AdEntity> byId = adEntityRepository.findById(id);
+
         if (byId.isEmpty()) {
             return true;
         }
+
         return byId
                 .map(ad -> ad.getAuthor().getUsername().equals(username))
                 .orElse(false);

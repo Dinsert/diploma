@@ -8,12 +8,14 @@ import ru.skypro.homework.service.ImageService;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.UUID;
 
 @Service
 public class ImageServiceImpl implements ImageService {
 
     private static final String IMAGE_DIRECTORY = System.getProperty("user.dir");
+    private static final String IMAGES = "/images/";
 
     @Value("${path.dir.image}")
     private String partDir;
@@ -21,18 +23,30 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public String saveImage(MultipartFile multipartFile) throws IOException {
         File directory = new File(IMAGE_DIRECTORY + partDir);
+
         if (!directory.exists()) {
             directory.mkdirs();
         }
+
         String fileName = UUID.randomUUID() + "_" + multipartFile.getOriginalFilename();
         File dest = new File(IMAGE_DIRECTORY + partDir + fileName);
+
         multipartFile.transferTo(dest);
-        return "/images/" + fileName;
+
+        return IMAGES + fileName;
     }
 
     @Override
     public byte[] getImage(String filePath) throws IOException {
-        File file = new File(IMAGE_DIRECTORY + partDir + filePath.replace("/images/", ""));
+        File file = new File(IMAGE_DIRECTORY + partDir + filePath.replace(IMAGES, ""));
+
         return Files.readAllBytes(file.toPath());
+    }
+
+    @Override
+    public void deleteImage(String filePath) throws IOException {
+        Path path = Path.of(IMAGE_DIRECTORY + partDir + filePath.replace(IMAGES, ""));
+
+        Files.deleteIfExists(path);
     }
 }

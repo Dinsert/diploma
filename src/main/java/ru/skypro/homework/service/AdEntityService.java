@@ -17,7 +17,7 @@ public interface AdEntityService {
 
     ExtendedAd getAds(int id, Authentication authentication);
 
-    void removeAd(int id);
+    void removeAd(int id) throws IOException;
 
     Ad updateAds(int id, CreateOrUpdateAd updateAd);
 
