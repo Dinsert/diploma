@@ -38,7 +38,6 @@ public class CommentEntityServiceImpl implements CommentEntityService {
         Comments comments = new Comments();
         comments.setResults(results);
         comments.setCount(results.size());
-
         return comments;
     }
 
@@ -60,6 +59,7 @@ public class CommentEntityServiceImpl implements CommentEntityService {
     @Override
     public void deleteComment(int adId, int commentId) {
         CommentEntity commentEntity = commentEntityRepository.findByAdEntity_PkAndPk(adId, commentId).orElseThrow();
+
         commentEntityRepository.delete(commentEntity);
     }
 
@@ -67,18 +67,22 @@ public class CommentEntityServiceImpl implements CommentEntityService {
     @Override
     public Comment updateComment(int adId, int commentId, CreateOrUpdateComment updateComment) {
         CommentEntity commentEntity = commentEntityRepository.findByAdEntity_PkAndPk(adId, commentId).orElseThrow();
+
         commentEntity.setText(updateComment.getText());
-        CommentEntity savedCommentEntity = commentEntityRepository.save(commentEntity);
-        return commentEntityMapper.toDto(savedCommentEntity);
+        commentEntityRepository.save(commentEntity);
+
+        return commentEntityMapper.toDto(commentEntity);
     }
 
     @Transactional(readOnly = true)
     @Override
     public boolean isOwner(String username, int adId, int commentId) {
         Optional<CommentEntity> byAdEntityPkAndPk = commentEntityRepository.findByAdEntity_PkAndPk(adId, commentId);
+
         if (byAdEntityPkAndPk.isEmpty()) {
             return true;
         }
+
         return byAdEntityPkAndPk
                 .map(comm -> comm.getAuthor().getUsername().equals(username))
                 .orElse(false);

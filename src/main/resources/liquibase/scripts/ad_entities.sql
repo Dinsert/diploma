@@ -6,7 +6,7 @@ CREATE TABLE ad_entities (
     title VARCHAR(100) NOT NULL,
     description VARCHAR(100) NOT NULL,
     price INTEGER NOT NULL,
-    image VARCHAR(100) NOT NULL,
+    image VARCHAR(255) NOT NULL,
     author INT NOT NULL,
     FOREIGN KEY (author) REFERENCES user_entities(id)
 );

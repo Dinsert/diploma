@@ -9,5 +9,5 @@ CREATE TABLE user_entities (
     last_name VARCHAR(100) NOT NULL,
     phone VARCHAR(100) NOT NULL,
     authority VARCHAR(100) NOT NULL,
-    image VARCHAR(100)
+    image VARCHAR(255)
 );
