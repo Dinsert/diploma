@@ -17,6 +17,10 @@ import ru.skypro.homework.service.AuthService;
 
 import javax.validation.Valid;
 
+/**
+ * Контроллер для управления аутентификации пользователей.
+ * Предоставляет API для регистрации и авторизации.
+ */
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
 @RestController
@@ -25,6 +29,12 @@ public class AuthController {
 
     private final AuthService authService;
 
+    /**
+     * Проверяет авторизацию пользователя.
+     *
+     * @param login данные для авторизации (логин и пароль пользователя)
+     * @return 200 OK если логин и пароль корректны, иначе 403 UNAUTHORIZED
+     */
     @Tag(name = "Авторизация")
     @Operation(summary = "Авторизация пользователя", operationId = "login")
     @ApiResponse(responseCode = "200", description = "OK")
@@ -38,6 +48,12 @@ public class AuthController {
         }
     }
 
+    /**
+     * Регистрирует пользователя.
+     *
+     * @param register данные для регистрации (логин, пароль, имя, фамилия, телефон и роль пользователя)
+     * @return 201 Created если регистрация успешна, иначе 400 Bad Request
+     */
     @Tag(name = "Регистрация")
     @Operation(summary = "Регистрация пользователя", operationId = "register")
     @ApiResponse(responseCode = "201", description = "Created")

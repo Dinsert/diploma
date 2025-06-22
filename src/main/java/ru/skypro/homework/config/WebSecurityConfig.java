@@ -26,6 +26,10 @@ import java.util.List;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
+/**
+ * Конфигурация безопасности приложения.
+ * Настраивает аутентификацию, авторизацию, CORS и обработку исключений безопасности.
+ */
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
@@ -33,7 +37,9 @@ public class WebSecurityConfig {
 
     private final ObjectMapper objectMapper;
 
-
+    /**
+     * Список путей, которые не требуют аутентификации.
+     */
     private static final String[] AUTH_WHITELIST = {
             "/swagger-resources/**",
             "/swagger-ui.html",
@@ -43,6 +49,12 @@ public class WebSecurityConfig {
             "/register"
     };
 
+    /**
+     * Создает менеджер пользователей на основе JDBC для работы с базой данных.
+     *
+     * @param dataSource источник данных для подключения к базе
+     * @return менеджер пользователей
+     */
     @Bean
     public JdbcUserDetailsManager userDetailsManager(DataSource dataSource) {
         JdbcUserDetailsManager manager = new JdbcUserDetailsManager(dataSource);
@@ -55,6 +67,13 @@ public class WebSecurityConfig {
         return manager;
     }
 
+    /**
+     * Настраивает цепочку безопасности для обработки HTTP-запросов.
+     *
+     * @param http объект конфигурации безопасности
+     * @return сконфигурированная цепочка безопасности
+     * @throws Exception если произошла ошибка конфигурации
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf().disable().cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -71,6 +90,11 @@ public class WebSecurityConfig {
         return http.build();
     }
 
+    /**
+     * Создает источник конфигурации CORS для обработки кросс-доменных запросов.
+     *
+     * @return источник конфигурации CORS
+     */
     @Bean
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -83,11 +107,24 @@ public class WebSecurityConfig {
         return source;
     }
 
+    /**
+     * Создает кодировщик паролей для безопасного хранения.
+     *
+     * @return экземпляр кодировщика паролей
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Обрабатывает случай, когда требуется аутентификация.
+     *
+     * @param request       запрос от клиента
+     * @param response      ответ клиенту
+     * @param authException исключение аутентификации
+     * @throws IOException если произошла ошибка ввода-вывода
+     */
     private void authenticationEntryPoint(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType("application/json");
@@ -102,6 +139,14 @@ public class WebSecurityConfig {
         response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
     }
 
+    /**
+     * Обрабатывает случай, когда доступ запрещен.
+     *
+     * @param request               запрос от клиента
+     * @param response              ответ клиенту
+     * @param accessDeniedException исключение доступа
+     * @throws IOException если произошла ошибка ввода-вывода
+     */
     private void accessDeniedHandler(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException {
         response.setStatus(HttpStatus.FORBIDDEN.value());
         response.setContentType("application/json");

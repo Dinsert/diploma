@@ -16,6 +16,10 @@ import ru.skypro.homework.service.CommentEntityService;
 
 import javax.validation.Valid;
 
+/**
+ * Контроллер для управления сущностями комментариев.
+ * Предоставляет API для обновления, получения, добавления и удаления комментариев.
+ */
 @Tag(name = "Комментарии")
 @RequestMapping("/ads")
 @RequiredArgsConstructor
@@ -24,6 +28,12 @@ public class CommentController {
 
     private final CommentEntityService commentEntityService;
 
+    /**
+     * Получает комментарии объявления. Доступно только аутентифицированным пользователям.
+     *
+     * @param id уникальный идентификатор объявления
+     * @return DTO с данными комментариев
+     */
     @Operation(summary = "Получение комментариев объявления", operationId = "getComments")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Comments.class)))
     @ApiResponse(responseCode = "401", description = "Unauthorized")
@@ -33,6 +43,14 @@ public class CommentController {
         return commentEntityService.getComments(id);
     }
 
+    /**
+     * Добавляет комментарий к объявлению. Доступно только аутентифицированным пользователям.
+     *
+     * @param id             уникальный идентификатор объявления
+     * @param createComment  данные для создания (текст комментария)
+     * @param authentication объект аутентификации для получения логина пользователя
+     * @return DTO с данными комментария
+     */
     @Operation(summary = "Добавление комментария к объявлению", operationId = "addComment")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Comment.class)))
     @ApiResponse(responseCode = "401", description = "Unauthorized")
@@ -42,6 +60,13 @@ public class CommentController {
         return commentEntityService.addComment(id, createComment, authentication);
     }
 
+    /**
+     * Удаляет комментарий в объявлении. Доступно только аутентифицированным пользователям,
+     * которые являются авторами комментария или пользователям с ролью ADMIN.
+     *
+     * @param adId      уникальный идентификатор объявления
+     * @param commentId уникальный идентификатор комментария
+     */
     @Operation(summary = "Удаление комментария", operationId = "deleteComment")
     @ApiResponse(responseCode = "200", description = "OK")
     @ApiResponse(responseCode = "401", description = "Unauthorized")
@@ -53,6 +78,15 @@ public class CommentController {
         commentEntityService.deleteComment(adId, commentId);
     }
 
+    /**
+     * Обновляет комментарий в объявлении. Доступно только аутентифицированным пользователям,
+     * которые являются авторами комментария или пользователям с ролью ADMIN.
+     *
+     * @param adId          уникальный идентификатор объявления
+     * @param commentId     уникальный идентификатор комментария
+     * @param updateComment данные для редактирования (текст комментария)
+     * @return DTO с данными комментария
+     */
     @Operation(summary = "Обновление комментария", operationId = "updateComment")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Comment.class)))
     @ApiResponse(responseCode = "401", description = "Unauthorized")

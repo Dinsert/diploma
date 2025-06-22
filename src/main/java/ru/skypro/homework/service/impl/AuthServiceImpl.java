@@ -10,14 +10,36 @@ import ru.skypro.homework.mapper.UserEntityMapper;
 import ru.skypro.homework.repository.UserEntityRepository;
 import ru.skypro.homework.service.AuthService;
 
+/**
+ * Сервис для управления аутентификации пользователей.
+ * Предоставляет методы для регистрации и авторизации.
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
+    /**
+     * Репозиторий для работы с сущностями пользователей в базе данных.
+     */
     private final UserEntityRepository userEntityRepository;
+
+    /**
+     * Кодировщик паролей для безопасного хранения.
+     */
     private final PasswordEncoder passwordEncoder;
+
+    /**
+     * Маппер для преобразования между сущностями и DTO.
+     */
     private final UserEntityMapper userEntityMapper;
 
+    /**
+     * Проверяет авторизацию пользователя.
+     *
+     * @param userName логин пользователя
+     * @param password пароль пользователя
+     * @return true если логин и пароль корректны, иначе false
+     */
     @Transactional(readOnly = true)
     @Override
     public boolean login(String userName, String password) {
@@ -26,6 +48,12 @@ public class AuthServiceImpl implements AuthService {
                 .orElse(false);
     }
 
+    /**
+     * Регистрирует пользователя.
+     *
+     * @param register данные для регистрации (логин, пароль, имя, фамилия, телефон и роль пользователя)
+     * @return true если регистрация успешна, иначе false
+     */
     @Transactional
     @Override
     public boolean register(Register register) {
