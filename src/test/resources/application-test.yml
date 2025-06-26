@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:tc:postgresql:15:///testdb?TC_DAEMON=true
+    username: test
+    password: test
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+  liquibase:
+    change-log: classpath:liquibase/changelog-master.yml
+    enabled: true
+    url: jdbc:tc:postgresql:15:///testdb?TC_DAEMON=true
+    user: test
+    password: test
+path:
+  dir:
+    image: /tmp/test-images/

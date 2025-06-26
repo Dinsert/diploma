@@ -1,0 +1,31 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/ads_db
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
+      - SPRING_LIQUIBASE_URL=jdbc:postgresql://db:5432/ads_db
+      - SPRING_LIQUIBASE_USER=user
+      - SPRING_LIQUIBASE_PASSWORD=password
+      - PATH_DIR_IMAGE=/app/images/
+    volumes:
+      - ./app/images/:/app/images/
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=ads_db
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

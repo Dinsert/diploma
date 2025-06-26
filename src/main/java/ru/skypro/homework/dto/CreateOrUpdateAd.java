@@ -1,9 +1,9 @@
 package ru.skypro.homework.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 
-import javax.validation.constraints.*;
 
 /**
  * DTO для создания или обновления объявления.

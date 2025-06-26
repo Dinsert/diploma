@@ -1,5 +1,6 @@
 package ru.skypro.homework.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,6 +17,7 @@ import java.util.UUID;
  * Предоставляет методы для сохранения, получения и удаления изображений.
  */
 @Service
+@Slf4j
 public class ImageServiceImpl implements ImageService {
 
     /**
@@ -37,7 +39,7 @@ public class ImageServiceImpl implements ImageService {
      * Путь до корневой папки изображений в проекте.
      */
     @Value("${path.dir.image}")
-    private String partDir;
+    private String imagePath;
 
     /**
      * Сохраняет загруженное изображение и возвращает путь к нему.
@@ -48,14 +50,15 @@ public class ImageServiceImpl implements ImageService {
      */
     @Override
     public String saveImage(MultipartFile multipartFile) throws IOException {
-        File directory = new File(IMAGE_DIRECTORY + partDir);
-
+        File directory = new File(IMAGE_DIRECTORY + imagePath);
+        log.info("Папка с изображениями находится по пути: {}", directory);
         if (!directory.exists()) {
             directory.mkdirs();
         }
 
         String fileName = UUID.randomUUID() + "_" + multipartFile.getOriginalFilename();
-        File dest = new File(IMAGE_DIRECTORY + partDir + fileName);
+        File dest = new File(directory, fileName);
+        log.info("Файл будет создан по этому пути: {}", dest);
 
         multipartFile.transferTo(dest);
 
@@ -71,7 +74,7 @@ public class ImageServiceImpl implements ImageService {
      */
     @Override
     public byte[] getImage(String filePath) throws IOException {
-        File file = new File(IMAGE_DIRECTORY + partDir + filePath.replace(IMAGES, ""));
+        File file = new File(IMAGE_DIRECTORY + imagePath + filePath.replace(IMAGES, ""));
 
         return Files.readAllBytes(file.toPath());
     }
@@ -84,7 +87,7 @@ public class ImageServiceImpl implements ImageService {
      */
     @Override
     public void deleteImage(String filePath) throws IOException {
-        Path path = Path.of(IMAGE_DIRECTORY + partDir + filePath.replace(IMAGES, ""));
+        Path path = Path.of(IMAGE_DIRECTORY + imagePath + filePath.replace(IMAGES, ""));
 
         Files.deleteIfExists(path);
     }
