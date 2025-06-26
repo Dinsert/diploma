@@ -19,15 +19,43 @@ import ru.skypro.homework.service.UserEntityService;
 
 import java.io.IOException;
 
+/**
+ * Сервис для управления сущностями пользователей.
+ * Предоставляет методы для обновления пароля, получения информации о пользователе,
+ * обновления профиля и аватара.
+ */
 @Service
 @RequiredArgsConstructor
 public class UserEntityServiceImpl implements UserEntityService {
 
+    /**
+     * Репозиторий для работы с сущностями пользователей в базе данных.
+     */
     private final UserEntityRepository userEntityRepository;
+
+    /**
+     * Кодировщик паролей для безопасного хранения.
+     */
     private final PasswordEncoder passwordEncoder;
+
+    /**
+     * Маппер для преобразования между сущностями и DTO.
+     */
     private final UserEntityMapper userEntityMapper;
+
+    /**
+     * Сервис для работы с изображениями.
+     */
     private final ImageService imageService;
 
+    /**
+     * Обновляет пароль текущего аутентифицированного пользователя.
+     *
+     * @param newPassword    данные нового и текущего пароля
+     * @param authentication объект аутентификации для получения логина пользователя
+     * @throws UserEntityNotFoundException если пользователь не найден
+     * @throws AccessDeniedException       если текущий пароль неверен
+     */
     @Transactional
     @Override
     public void setPassword(NewPassword newPassword, Authentication authentication) {
@@ -41,6 +69,13 @@ public class UserEntityServiceImpl implements UserEntityService {
         userEntityRepository.save(userEntity);
     }
 
+    /**
+     * Получает информацию о текущем аутентифицированном пользователе.
+     *
+     * @param authentication объект аутентификации для получения логина пользователя
+     * @return DTO с данными пользователя
+     * @throws UserEntityNotFoundException если пользователь не найден
+     */
     @Transactional(readOnly = true)
     @Override
     public User getUser(Authentication authentication) {
@@ -49,6 +84,14 @@ public class UserEntityServiceImpl implements UserEntityService {
         return userEntityMapper.toDTO(userEntity);
     }
 
+    /**
+     * Обновляет информацию о текущем аутентифицированном пользователе.
+     *
+     * @param updateUser     данные для обновления (имя, фамилия, телефон)
+     * @param authentication объект аутентификации для получения логина пользователя
+     * @return обновленный DTO пользователя
+     * @throws UserEntityNotFoundException если пользователь не найден
+     */
     @Transactional
     @Override
     public UpdateUser updateUser(UpdateUser updateUser, Authentication authentication) {
@@ -60,6 +103,14 @@ public class UserEntityServiceImpl implements UserEntityService {
         return updateUser;
     }
 
+    /**
+     * Обновляет аватар текущего аутентифицированного пользователя.
+     *
+     * @param image          файл изображения
+     * @param authentication объект аутентификации для получения логина пользователя
+     * @throws IOException                 если произошла ошибка при обработке изображения
+     * @throws UserEntityNotFoundException если пользователь не найден
+     */
     @Transactional
     @Override
     public void updateUserImage(MultipartFile image, Authentication authentication) throws IOException {

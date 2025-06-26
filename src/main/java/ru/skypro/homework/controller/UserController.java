@@ -19,7 +19,11 @@ import ru.skypro.homework.service.UserEntityService;
 import javax.validation.Valid;
 import java.io.IOException;
 
-
+/**
+ * Контроллер для управления сущностями пользователей.
+ * Предоставляет API для обновления пароля, получения информации о пользователе,
+ * обновления профиля и аватара.
+ */
 @Tag(name = "Пользователи")
 @RequestMapping("/users")
 @RequiredArgsConstructor
@@ -28,6 +32,12 @@ public class UserController {
 
     private final UserEntityService userEntityService;
 
+    /**
+     * Обновляет пароль текущего аутентифицированного пользователя.
+     *
+     * @param newPassword    данные нового и текущего пароля
+     * @param authentication объект аутентификации для получения логина пользователя
+     */
     @Operation(summary = "Обновление пароля", operationId = "setPassword")
     @ApiResponse(responseCode = "200", description = "OK")
     @ApiResponse(responseCode = "401", description = "Unauthorized")
@@ -38,6 +48,12 @@ public class UserController {
         userEntityService.setPassword(newPassword, authentication);
     }
 
+    /**
+     * Получает информацию о текущем аутентифицированном пользователе.
+     *
+     * @param authentication объект аутентификации для получения логина пользователя
+     * @return DTO с данными пользователя
+     */
     @Operation(summary = "Получение информации об авторизованном пользователе", operationId = "getUser")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = User.class)))
     @ApiResponse(responseCode = "401", description = "Unauthorized")
@@ -46,6 +62,13 @@ public class UserController {
         return userEntityService.getUser(authentication);
     }
 
+    /**
+     * Обновляет информацию о текущем аутентифицированном пользователе.
+     *
+     * @param updateUser     данные для обновления (имя, фамилия, телефон)
+     * @param authentication объект аутентификации для получения логина пользователя
+     * @return обновленный DTO пользователя
+     */
     @Operation(summary = "Обновление информации об авторизованном пользователе", operationId = "updateUser")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = UpdateUser.class)))
     @ApiResponse(responseCode = "401", description = "Unauthorized")
@@ -54,6 +77,13 @@ public class UserController {
         return userEntityService.updateUser(updateUser, authentication);
     }
 
+    /**
+     * Обновляет аватар текущего аутентифицированного пользователя.
+     *
+     * @param image          файл изображения
+     * @param authentication объект аутентификации для получения логина пользователя
+     * @throws IOException если произошла ошибка при обработке изображения
+     */
     @Operation(summary = "Обновление аватара авторизованного пользователя", operationId = "updateUserImage")
     @ApiResponse(responseCode = "200", description = "OK")
     @ApiResponse(responseCode = "401", description = "Unauthorized")

@@ -23,15 +23,39 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Сервис для управления сущностями объявлений.
+ * Предоставляет методы для обновления, получения, добавления и удаления объявлений.
+ */
 @RequiredArgsConstructor
 @Service
 public class AdEntityServiceImpl implements AdEntityService {
 
+    /**
+     * Репозиторий для работы с сущностями объявлений в базе данных.
+     */
     private final AdEntityRepository adEntityRepository;
+
+    /**
+     * Маппер для преобразования между сущностями и DTO.
+     */
     private final AdEntityMapper adEntityMapper;
+
+    /**
+     * Репозиторий для работы с сущностями пользователей в базе данных.
+     */
     private final UserEntityRepository userEntityRepository;
+
+    /**
+     * Сервис для работы с изображениями.
+     */
     private final ImageService imageService;
 
+    /**
+     * Получает все объявления.
+     *
+     * @return DTO с данными объявлений
+     */
     @Transactional(readOnly = true)
     @Override
     public Ads getAllAds() {
@@ -43,6 +67,15 @@ public class AdEntityServiceImpl implements AdEntityService {
         return ads;
     }
 
+    /**
+     * Добавляет объявление. Доступно только аутентифицированным пользователям.
+     *
+     * @param properties     данные для создания (заголовок, описание и цена объявления)
+     * @param image          файл изображения
+     * @param authentication объект аутентификации для получения логина пользователя
+     * @return DTO с данными объявления
+     * @throws UserEntityNotFoundException если пользователь не найден
+     */
     @Transactional
     @Override
     public Ad addAd(CreateOrUpdateAd properties, MultipartFile image, Authentication authentication) throws IOException {
@@ -55,6 +88,13 @@ public class AdEntityServiceImpl implements AdEntityService {
         return adEntityMapper.toDto(savedAdEntity);
     }
 
+    /**
+     * Получает расширенную информацию объявления текущего аутентифицированного пользователя.
+     *
+     * @param id уникальный идентификатор объявления
+     * @return DTO с расширенными данными объявления
+     * @throws AdEntityNotFoundException если объявление не найдено
+     */
     @Transactional(readOnly = true)
     @Override
     public ExtendedAd getAds(int id, Authentication authentication) {
@@ -63,6 +103,13 @@ public class AdEntityServiceImpl implements AdEntityService {
         return adEntityMapper.toExtendedAd(adEntity);
     }
 
+    /**
+     * Удаляет объявление. Доступно только аутентифицированным пользователям.
+     *
+     * @param id уникальный идентификатор объявления
+     * @throws AdEntityNotFoundException если объявление не найдено
+     * @throws IOException               если произошла ошибка при обработке изображения
+     */
     @Transactional
     @Override
     public void removeAd(int id) throws IOException {
@@ -73,6 +120,14 @@ public class AdEntityServiceImpl implements AdEntityService {
         imageService.deleteImage(adEntityImage);
     }
 
+    /**
+     * Обновляет объявление. Доступно только аутентифицированным пользователям.
+     *
+     * @param id       уникальный идентификатор объявления
+     * @param updateAd данные для редактирования (заголовок, описание и цена объявления)
+     * @return DTO с данными объявления
+     * @throws AdEntityNotFoundException если комментарий не найден
+     */
     @Transactional
     @Override
     public Ad updateAds(int id, CreateOrUpdateAd updateAd) {
@@ -84,6 +139,13 @@ public class AdEntityServiceImpl implements AdEntityService {
         return adEntityMapper.toDto(adEntity);
     }
 
+    /**
+     * Получает объявления текущего аутентифицированного пользователя.
+     *
+     * @param authentication объект аутентификации для получения логина пользователя
+     * @return DTO с данными объявлений
+     * @throws UserEntityNotFoundException если пользователь не найден
+     */
     @Transactional(readOnly = true)
     @Override
     public Ads getAdsMe(Authentication authentication) {
@@ -96,6 +158,15 @@ public class AdEntityServiceImpl implements AdEntityService {
         return ads;
     }
 
+    /**
+     * Обновляет изображение в объявлении. Доступно только аутентифицированным пользователям.
+     *
+     * @param id             уникальный идентификатор объявления
+     * @param image          файл изображения
+     * @param authentication объект аутентификации для получения логина пользователя
+     * @return массив байт изображения
+     * @throws AdEntityNotFoundException если объявление не найдено
+     */
     @Transactional
     @Override
     public byte[] updateImage(int id, MultipartFile image, Authentication authentication) throws IOException {
@@ -110,6 +181,14 @@ public class AdEntityServiceImpl implements AdEntityService {
         return imageService.getImage(imagePath);
     }
 
+    /**
+     * Проверяет принадлежность объявления к аутентифицированному пользователю.
+     *
+     * @param username логин пользователя
+     * @param id       уникальный идентификатор объявления
+     * @return true если объявление не найдено или принадлежит пользователю,
+     * false если объявление не принадлежит пользователю
+     */
     @Transactional(readOnly = true)
     @Override
     public boolean isOwner(String username, int id) {

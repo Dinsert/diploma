@@ -21,6 +21,10 @@ import ru.skypro.homework.service.AdEntityService;
 import javax.validation.Valid;
 import java.io.IOException;
 
+/**
+ * Контроллер для управления сущностями объявлений.
+ * Предоставляет API для обновления, получения, добавления и удаления объявлений.
+ */
 @Tag(name = "Объявления")
 @RequiredArgsConstructor
 @RequestMapping("/ads")
@@ -29,6 +33,11 @@ public class AdController {
 
     private final AdEntityService adEntityService;
 
+    /**
+     * Получает все объявления.
+     *
+     * @return DTO с данными объявлений
+     */
     @Operation(summary = "Получение всех объявлений", operationId = "getAllAds")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Ads.class)))
     @GetMapping
@@ -36,6 +45,14 @@ public class AdController {
         return adEntityService.getAllAds();
     }
 
+    /**
+     * Добавляет объявление. Доступно только аутентифицированным пользователям.
+     *
+     * @param properties     данные для создания (заголовок, описание и цена объявления)
+     * @param image          файл изображения
+     * @param authentication объект аутентификации для получения логина пользователя
+     * @return DTO с данными объявления
+     */
     @Operation(summary = "Добавление объявления", operationId = "addAd")
     @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = Ad.class)))
     @ApiResponse(responseCode = "401", description = "Unauthorized")
@@ -45,6 +62,12 @@ public class AdController {
         return adEntityService.addAd(properties, image, authentication);
     }
 
+    /**
+     * Получает расширенную информацию объявления текущего аутентифицированного пользователя.
+     *
+     * @param id уникальный идентификатор объявления
+     * @return DTO с расширенными данными объявления
+     */
     @Operation(summary = "Получение информации об объявлении", operationId = "getAds")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ExtendedAd.class)))
     @ApiResponse(responseCode = "401", description = "Unauthorized")
@@ -54,6 +77,13 @@ public class AdController {
         return adEntityService.getAds(id, authentication);
     }
 
+    /**
+     * Удаляет объявление. Доступно только аутентифицированным пользователям,
+     * которые являются авторами объявления или пользователям с ролью ADMIN.
+     *
+     * @param id уникальный идентификатор объявления
+     * @throws IOException если произошла ошибка при обработке изображения
+     */
     @Operation(summary = "Удаление объявления", operationId = "removeAd")
     @ApiResponse(responseCode = "204", description = "No Content")
     @ApiResponse(responseCode = "401", description = "Unauthorized")
@@ -66,6 +96,14 @@ public class AdController {
         adEntityService.removeAd(id);
     }
 
+    /**
+     * Обновляет объявление. Доступно только аутентифицированным пользователям,
+     * которые являются авторами объявления или пользователям с ролью ADMIN.
+     *
+     * @param id       уникальный идентификатор объявления
+     * @param updateAd данные для редактирования (заголовок, описание и цена объявления)
+     * @return DTO с данными объявления
+     */
     @Operation(summary = "Обновление информации об объявлении", operationId = "updateAds")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Ad.class)))
     @ApiResponse(responseCode = "401", description = "Unauthorized")
@@ -77,6 +115,12 @@ public class AdController {
         return adEntityService.updateAds(id, updateAd);
     }
 
+    /**
+     * Получает объявления текущего аутентифицированного пользователя.
+     *
+     * @param authentication объект аутентификации для получения логина пользователя
+     * @return DTO с данными объявлений
+     */
     @Operation(summary = "Получение объявлений авторизованного пользователя", operationId = "getAdsMe")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Ads.class)))
     @ApiResponse(responseCode = "401", description = "Unauthorized")
@@ -85,6 +129,15 @@ public class AdController {
         return adEntityService.getAdsMe(authentication);
     }
 
+    /**
+     * Обновляет изображение в объявлении. Доступно только аутентифицированным пользователям,
+     * которые являются авторами объявления или пользователям с ролью ADMIN.
+     *
+     * @param id             уникальный идентификатор объявления
+     * @param image          файл изображения
+     * @param authentication объект аутентификации для получения логина пользователя
+     * @return массив байт изображения
+     */
     @Operation(summary = "Обновление картинки объявления", operationId = "updateImage")
     @ApiResponse(responseCode = "200", description = "OK",
             content = @Content(mediaType = "application/octet-stream", schema = @Schema(type = "string", format = "byte")))
