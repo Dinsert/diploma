@@ -1,11 +1,11 @@
 package ru.skypro.homework.entity;
 
+import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.*;
 import java.util.List;
 
 /**
@@ -29,7 +29,7 @@ public class UserEntity {
     /**
      * Логин пользователя (email).
      */
-    @Column(name = "username", nullable = false, length = 32)
+    @Column(name = "username", unique = true, length = 32)
     private String username;
 
     /**

@@ -1,14 +1,17 @@
 package ru.skypro.homework.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,8 +21,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import ru.skypro.homework.dto.ErrorResponseDTO;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.List;
@@ -31,7 +32,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
  * Настраивает аутентификацию, авторизацию, CORS и обработку исключений безопасности.
  */
 @Configuration
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig {
 
@@ -41,10 +42,9 @@ public class WebSecurityConfig {
      * Список путей, которые не требуют аутентификации.
      */
     private static final String[] AUTH_WHITELIST = {
-            "/swagger-resources/**",
             "/swagger-ui.html",
-            "/v3/api-docs",
-            "/webjars/**",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
             "/login",
             "/register"
     };
@@ -76,15 +76,17 @@ public class WebSecurityConfig {
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf().disable().cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests(authorization ->
-                        authorization
-                                .mvcMatchers(HttpMethod.GET, "/ads").permitAll()
-                                .mvcMatchers(AUTH_WHITELIST).permitAll()
-                                .mvcMatchers("/ads/**", "/users/**").authenticated())
-                .cors()
-                .and()
-                .httpBasic(withDefaults()).exceptionHandling(ex -> ex
+        http
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .authorizeHttpRequests(auth ->
+                        auth
+                                .requestMatchers(HttpMethod.GET, "/ads").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/images/**").permitAll()
+                                .requestMatchers(AUTH_WHITELIST).permitAll()
+                                .anyRequest().authenticated())
+                .httpBasic(withDefaults())
+                .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(this::authenticationEntryPoint)
                         .accessDeniedHandler(this::accessDeniedHandler));
         return http.build();

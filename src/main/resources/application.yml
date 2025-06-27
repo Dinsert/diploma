@@ -14,4 +14,7 @@ spring:
     password: password
 path:
   dir:
-    image: /uploads/images/
+    image: /app/images/
+springdoc:
+  api-docs:
+    enabled: true

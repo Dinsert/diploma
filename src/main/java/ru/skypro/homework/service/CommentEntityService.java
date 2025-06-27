@@ -15,7 +15,7 @@ public interface CommentEntityService {
      * Получает список комментариев для указанного объявления.
      *
      * @param id идентификатор объявления
-     * @return объект DTO с списком комментариев
+     * @return объект DTO со списком комментариев
      */
     Comments getComments(int id);
 

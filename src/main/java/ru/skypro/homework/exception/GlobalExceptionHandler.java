@@ -1,15 +1,16 @@
 package ru.skypro.homework.exception;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.skypro.homework.dto.ErrorResponseDTO;
 
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * Глобальный обработчик исключений для API.
@@ -73,6 +74,20 @@ public class GlobalExceptionHandler {
                 : "Ошибка валидации";
         log.warn("Ошибка валидации: {}", message);
         return createErrorResponse(HttpStatus.BAD_REQUEST, "Bad Request", message, request.getRequestURI());
+    }
+
+    /**
+     * Обрабатывает исключения доступа, связанные с недостатком прав.
+     *
+     * @param ex      исключение доступа
+     * @param request запрос, вызвавший исключение
+     * @return ответ с кастомным сообщением об ошибке
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponseDTO> handleAccessDeniedException(AccessDeniedException ex, HttpServletRequest request) {
+        log.warn("Доступ запрещен для запроса: URI={}, Message={}", request.getRequestURI(), ex.getMessage(), ex);
+        String message = "У вас недостаточно прав для выполнения этого действия. Вы не являетесь владельцем объявления.";
+        return createErrorResponse(HttpStatus.FORBIDDEN, "Forbidden", message, request.getRequestURI());
     }
 
     /**
